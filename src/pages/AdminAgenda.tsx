@@ -1,11 +1,19 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { format, parseISO } from "date-fns"
+import { format, parseISO, startOfMonth, endOfMonth, isSameMonth } from "date-fns"
 import { ptBR } from "date-fns/locale"
-import { Phone, LogOut } from "lucide-react"
+import { Phone, LogOut, ChevronLeft, ChevronRight } from "lucide-react"
 import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { isAuthenticated, logout } from "@/lib/auth"
 import { Button } from "@/components/ui/button"
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
 
 interface Agendamento {
   id: string
@@ -21,6 +29,7 @@ interface Agendamento {
 
 const AdminAgenda = () => {
   const [agendamentos, setAgendamentos] = useState<Agendamento[]>([]);
+  const [currentDate, setCurrentDate] = useState(new Date());
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -32,10 +41,8 @@ const AdminAgenda = () => {
     const loadAgendamentos = () => {
       try {
         const storedAgendamentos = localStorage.getItem('agendamentos');
-        console.log('Dados brutos do localStorage:', storedAgendamentos); // Debug
         if (storedAgendamentos) {
           const parsedAgendamentos = JSON.parse(storedAgendamentos);
-          console.log('Agendamentos carregados:', parsedAgendamentos); // Debug
           setAgendamentos(parsedAgendamentos);
         }
       } catch (error) {
@@ -62,15 +69,30 @@ const AdminAgenda = () => {
     }
   };
 
+  const nextMonth = () => {
+    setCurrentDate(prev => new Date(prev.getFullYear(), prev.getMonth() + 1));
+  };
+
+  const previousMonth = () => {
+    setCurrentDate(prev => new Date(prev.getFullYear(), prev.getMonth() - 1));
+  };
+
+  const filteredAgendamentos = agendamentos.filter(agendamento => {
+    const agendamentoDate = parseISO(agendamento.data);
+    return isSameMonth(agendamentoDate, currentDate);
+  });
+
+  const currentMonthYear = format(currentDate, "MMMM 'de' yyyy", { locale: ptBR });
+
   return (
     <div className="min-h-screen pt-20 bg-background">
       <div className="container mx-auto px-4">
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-6xl mx-auto">
           <div className="flex justify-between items-center mb-8">
             <div>
               <h1 className="text-3xl font-bold text-primary mb-2">Agenda de Agendamentos</h1>
               <p className="text-muted-foreground">
-                Total de agendamentos: {agendamentos.length}
+                Total de agendamentos no mês: {filteredAgendamentos.length}
               </p>
             </div>
             <Button variant="outline" onClick={handleLogout}>
@@ -79,71 +101,69 @@ const AdminAgenda = () => {
             </Button>
           </div>
 
-          {agendamentos.length === 0 ? (
-            <Card>
-              <CardContent className="py-8">
-                <p className="text-center text-muted-foreground">Nenhum agendamento encontrado.</p>
-              </CardContent>
-            </Card>
-          ) : (
-            <div className="grid gap-4">
-              {agendamentos
-                .sort((a, b) => new Date(a.data).getTime() - new Date(b.data).getTime())
-                .map((agendamento) => (
-                  <Card key={agendamento.id} className="hover:shadow-lg transition-shadow">
-                    <CardHeader>
-                      <CardTitle className="flex justify-between items-center">
-                        <span>
-                          {formatarData(agendamento.data)} - {agendamento.horario}
-                        </span>
-                        <a 
-                          href={`https://wa.me/${agendamento.whatsapp}`} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          className="text-green-600 hover:text-green-700"
-                        >
-                          <Phone className="h-5 w-5" />
-                        </a>
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-2">
-                        <div className="grid grid-cols-2 gap-2">
-                          <div>
-                            <p className="font-semibold">Cliente:</p>
-                            <p>{agendamento.cliente}</p>
-                          </div>
-                          <div>
-                            <p className="font-semibold">Serviço:</p>
-                            <p>{agendamento.servico}</p>
-                          </div>
-                        </div>
-                        <div className="grid grid-cols-2 gap-2">
-                          <div>
-                            <p className="font-semibold">WhatsApp:</p>
-                            <p>{agendamento.whatsapp}</p>
-                          </div>
-                          <div>
-                            <p className="font-semibold">Email:</p>
-                            <p>{agendamento.email}</p>
-                          </div>
-                        </div>
-                        <div className="grid grid-cols-2 gap-2">
-                          <div>
-                            <p className="font-semibold">Serviço:</p>
-                            <p>{agendamento.servico}</p>
-                          </div>
-                          <div>
-                            <p className="font-semibold">Valor:</p>
-                            <p className="text-green-600 font-medium">{agendamento.preco}</p>
-                          </div>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-            </div>
-          )}
+          <Card className="mb-8">
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <Button variant="outline" size="icon" onClick={previousMonth}>
+                  <ChevronLeft className="h-4 w-4" />
+                </Button>
+                <CardTitle className="text-xl font-semibold capitalize">
+                  {currentMonthYear}
+                </CardTitle>
+                <Button variant="outline" size="icon" onClick={nextMonth}>
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent>
+              {filteredAgendamentos.length === 0 ? (
+                <p className="text-center text-muted-foreground py-8">
+                  Nenhum agendamento encontrado para este mês.
+                </p>
+              ) : (
+                <div className="overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Data</TableHead>
+                        <TableHead>Horário</TableHead>
+                        <TableHead>Cliente</TableHead>
+                        <TableHead>Serviço</TableHead>
+                        <TableHead>Valor</TableHead>
+                        <TableHead>Contato</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {filteredAgendamentos
+                        .sort((a, b) => new Date(a.data).getTime() - new Date(b.data).getTime())
+                        .map((agendamento) => (
+                          <TableRow key={agendamento.id}>
+                            <TableCell>{formatarData(agendamento.data)}</TableCell>
+                            <TableCell>{agendamento.horario}</TableCell>
+                            <TableCell>{agendamento.cliente}</TableCell>
+                            <TableCell>{agendamento.servico}</TableCell>
+                            <TableCell className="text-green-600 font-medium">
+                              {agendamento.preco}
+                            </TableCell>
+                            <TableCell>
+                              <a
+                                href={`https://wa.me/${agendamento.whatsapp}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center text-green-600 hover:text-green-700"
+                              >
+                                <Phone className="h-4 w-4 mr-1" />
+                                WhatsApp
+                              </a>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              )}
+            </CardContent>
+          </Card>
         </div>
       </div>
     </div>
