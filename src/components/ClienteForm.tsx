@@ -79,20 +79,15 @@ export function ClienteForm({ date, time, onCancel, onSuccess }: ClienteFormProp
 
       // Limpar form e redirecionar após um breve delay
       setTimeout(() => {
-        setFormData({
-          ...initialFormData,
-          data: date.toISOString(),
-          horario: time
-        });
-        
+        setFormData(initialFormData);
         if (onSuccess) {
           onSuccess();
         }
-        
         navigate('/');
       }, 2000);
 
     } catch (error) {
+      console.error('Erro ao fazer agendamento:', error);
       toast.error("Ocorreu um erro ao fazer seu agendamento. Por favor, tente novamente.");
     } finally {
       setIsSubmitting(false);
