@@ -19,14 +19,14 @@ export const Servicos = () => {
           Nossos Serviços
         </h2>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {servicos.map((servico) => (
             <div
               key={servico.nome}
-              className="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow animate-fade-up"
+              className="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow animate-fade-up border border-gray-100"
             >
-              <h3 className="text-xl font-semibold text-primary mb-4">{servico.nome}</h3>
-              <p className="text-2xl font-bold text-secondary">{servico.preco}</p>
+              <h3 className="text-xl font-bold text-gray-900 mb-3">{servico.nome}</h3>
+              <p className="text-2xl font-extrabold text-secondary">{servico.preco}</p>
             </div>
           ))}
         </div>
