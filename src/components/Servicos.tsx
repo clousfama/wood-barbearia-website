@@ -1,17 +1,6 @@
-export const Servicos = () => {
-  const servicos = [
-    { nome: "Corte", preco: "R$ 35,00" },
-    { nome: "Barba", preco: "R$ 25,00" },
-    { nome: "Pezinho", preco: "R$ 10,00" },
-    { nome: "Sombrancelha", preco: "R$ 10,00" },
-    { nome: "Corte + Barba", preco: "R$ 55,00" },
-    { nome: "Corte + Hidratação", preco: "R$ 75,00" },
-    { nome: "Pintura", preco: "R$ 35,00" },
-    { nome: "Progressiva", preco: "a partir de R$ 70,00" },
-    { nome: "Luzes", preco: "R$ 70,00" },
-    { nome: "Platinado", preco: "a partir de R$ 160,00" },
-  ];
+import { servicos } from "@/data/servicos";
 
+export const Servicos = () => {
   return (
     <section id="servicos" className="py-20 bg-accent">
       <div className="container mx-auto px-4">
@@ -23,7 +12,7 @@ export const Servicos = () => {
           {servicos.map((servico) => (
             <div
               key={servico.nome}
-              className="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow animate-fade-up border border-gray-100"
+              className="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow animate-fade-up border border-gray-200"
             >
               <h3 className="text-xl font-bold text-gray-900 mb-3">{servico.nome}</h3>
               <p className="text-2xl font-extrabold text-secondary">{servico.preco}</p>
