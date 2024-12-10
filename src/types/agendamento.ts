@@ -28,4 +28,5 @@ export interface Agendamento {
   whatsapp: string;
   email: string;
   status: 'pendente' | 'confirmado' | 'cancelado';
+  preco?: string; // Added the preco property as optional
 }
