@@ -3,9 +3,7 @@ import { toast } from "sonner"
 import { useState } from "react"
 import { FormData, ClienteFormProps } from "@/types/agendamento"
 import { FormFields } from "./FormFields"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
-import { format } from "date-fns"
-import { ptBR } from "date-fns/locale"
+import { useNavigate } from "react-router-dom"
 
 const initialFormData: FormData = {
   nome: "",
@@ -19,6 +17,9 @@ const initialFormData: FormData = {
 const saveAgendamento = (formData: FormData) => {
   try {
     const agendamentos = JSON.parse(localStorage.getItem('agendamentos') || '[]')
+    const servicos = JSON.parse(localStorage.getItem('servicos') || '[]')
+    const servicoSelecionado = servicos.find((s: any) => s.nome === formData.servico)
+    
     const novoAgendamento = {
       id: Date.now().toString(),
       data: formData.data,
@@ -27,6 +28,7 @@ const saveAgendamento = (formData: FormData) => {
       servico: formData.servico,
       whatsapp: formData.whatsapp,
       email: formData.email,
+      preco: servicoSelecionado?.preco || '',
       status: 'pendente'
     }
     agendamentos.push(novoAgendamento)
@@ -45,7 +47,7 @@ export function ClienteForm({ date, time, onCancel, onSuccess }: ClienteFormProp
     horario: time
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [showConfirmation, setShowConfirmation] = useState(false)
+  const navigate = useNavigate()
 
   const handleChange = (field: keyof FormData) => (
     e: React.ChangeEvent<HTMLInputElement> | string
@@ -77,7 +79,9 @@ export function ClienteForm({ date, time, onCancel, onSuccess }: ClienteFormProp
       }
 
       toast.success("Agendamento confirmado com sucesso!")
-      onSuccess()
+      setTimeout(() => {
+        navigate('/')
+      }, 2000)
 
     } catch (error) {
       console.error('Erro ao fazer agendamento:', error)
