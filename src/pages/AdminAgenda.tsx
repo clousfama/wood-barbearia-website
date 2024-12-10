@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { format, parseISO, startOfMonth, endOfMonth, isSameMonth } from "date-fns"
+import { format, parseISO, isSameMonth } from "date-fns"
 import { ptBR } from "date-fns/locale"
 import { Phone, LogOut, ChevronLeft, ChevronRight } from "lucide-react"
 import { useEffect, useState } from "react"
@@ -15,17 +15,7 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { servicos } from "@/data/servicos"
-
-interface Agendamento {
-  id: string
-  data: string
-  horario: string
-  cliente: string
-  servico: string
-  whatsapp: string
-  email: string
-  status: string
-}
+import { Agendamento } from "@/types/agendamento"
 
 const AdminAgenda = () => {
   const [agendamentos, setAgendamentos] = useState<Agendamento[]>([]);
@@ -43,7 +33,6 @@ const AdminAgenda = () => {
         const storedAgendamentos = localStorage.getItem('agendamentos');
         if (storedAgendamentos) {
           const parsedAgendamentos = JSON.parse(storedAgendamentos);
-          // Adicionar o preço do serviço aos agendamentos
           const agendamentosComPreco = parsedAgendamentos.map((ag: Agendamento) => {
             const servicoEncontrado = servicos.find(s => s.nome === ag.servico);
             return {
