@@ -14,6 +14,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import { servicos } from "@/data/servicos"
 
 interface Agendamento {
   id: string
@@ -21,7 +22,6 @@ interface Agendamento {
   horario: string
   cliente: string
   servico: string
-  preco: string
   whatsapp: string
   email: string
   status: string
@@ -43,7 +43,15 @@ const AdminAgenda = () => {
         const storedAgendamentos = localStorage.getItem('agendamentos');
         if (storedAgendamentos) {
           const parsedAgendamentos = JSON.parse(storedAgendamentos);
-          setAgendamentos(parsedAgendamentos);
+          // Adicionar o preço do serviço aos agendamentos
+          const agendamentosComPreco = parsedAgendamentos.map((ag: Agendamento) => {
+            const servicoEncontrado = servicos.find(s => s.nome === ag.servico);
+            return {
+              ...ag,
+              preco: servicoEncontrado?.preco || 'Não definido'
+            };
+          });
+          setAgendamentos(agendamentosComPreco);
         }
       } catch (error) {
         console.error('Erro ao carregar agendamentos:', error);
